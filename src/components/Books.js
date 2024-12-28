@@ -4,17 +4,15 @@ import { Link, useParams } from "react-router-dom";
 import { useData } from "./DataProvider";
 import CustomAlert from "./CustomAlert";
 
-export default function Books() {
+export default function Books({ books, librarians, libraries, genres }) {
   const { id } = useParams();
-  const { books, librarians, libraries, genres } = useData();
+  const { updateData } = useData();
   const [userData, setUserData] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
-
   const library = libraries[id];
-  const filteredBooks = books.filter(
-    (book) => book.library_id === parseInt(id)
-  );
-  const filteredlibraries = librarians.filter(
+
+  var filteredBooks = books.filter((book) => book.library_id === parseInt(id));
+  var filteredlibraries = librarians.filter(
     (librarian) => librarian.library_id === parseInt(id)
   );
 
@@ -35,7 +33,7 @@ export default function Books() {
     };
 
     fetchUserData();
-  }, [id]);
+  }, [books]);
 
   const HandleReservation = async (user_id, book_id, librarian_id) => {
     const token = localStorage.getItem("userToken");
@@ -69,11 +67,12 @@ export default function Books() {
       )
       .then((res) => {
         console.log("Статус успішно змінено");
-        window.location.reload();
       })
       .catch((err) => {
         console.error("Помилка при зміні статусу:" + err);
       });
+
+    updateData();
   };
 
   return (

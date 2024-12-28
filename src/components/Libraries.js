@@ -1,16 +1,21 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useData } from "./DataProvider";
 
 export default function Libraries() {
+  const [showLibraries, setShowLibraries] = useState(null);
   const { libraries } = useData();
+
+  useEffect(() => {
+    setShowLibraries(libraries);
+  }, [libraries]);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-6">Каталог бібліотек</h1>
-      {libraries ? (
+      {showLibraries ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {libraries.map((library) => (
+          {showLibraries.map((library) => (
             <div
               key={library.library_id}
               className="border rounded-lg p-6 shadow-md"

@@ -3,14 +3,13 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useData } from "./DataProvider";
 
-const Profile = () => {
+const Profile = (reservations) => {
   const [userData, setUserData] = useState(null);
-  const [reservations, setReservations] = useState(null);
-  const { books } = useData();
+  const { books, updateData } = useData();
 
   const filteredReservations =
     reservations && userData
-      ? reservations.filter(
+      ? reservations.reservations.filter(
           (reservation) => reservation.user_id === userData.user_id
         )
       : [];
@@ -31,23 +30,8 @@ const Profile = () => {
         });
     };
 
-    const UpdateReservationData = async () => {
-      const token = localStorage.getItem("userToken");
-      await axios
-        .get("http://localhost:5000/api/reservations/all", {
-          headers: { Authorization: token },
-        })
-        .then((res) => {
-          setReservations(res.data);
-        })
-        .catch((err) => {
-          console.log("Помилка при оновленні даних резервування:", err);
-        });
-    };
-
     fetchUserData();
-    UpdateReservationData();
-  }, []);
+  }, [reservations]);
 
   const handleLogOut = () => {
     localStorage.clear();
@@ -75,20 +59,16 @@ const Profile = () => {
         headers: { Authorization: token },
       })
       .then((res) => {
-        window.location.reload();
         console.log("Резервування успішно видалено");
       })
       .catch((err) => {
         console.error("Помилка при видаленні резервування:", err);
       });
-  };
 
-  const UpdateReservations = () => {
-    filteredReservations = userData
-      ? reservations.filter(
-          (reservation) => reservation.user_id === userData.user_id
-        )
-      : [];
+    filteredReservations.filter(
+      (reservation) => reservation.reservation_id !== reservationId
+    );
+    updateData();
   };
 
   return (
@@ -120,10 +100,6 @@ const Profile = () => {
           </div>
         </div>
       )}
-
-      {() => {
-        UpdateReservations();
-      }}
 
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="p-6">

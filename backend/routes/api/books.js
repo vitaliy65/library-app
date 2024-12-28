@@ -112,22 +112,26 @@ router.post(
         return res.status(404).json({ error: "Книгу не знайдено" });
       }
 
-      if (
-        book.copies > 0 &&
-        status === "reserved" &&
-        book.status === "available"
-      ) {
-        book.copies -= 1;
-      } else if (
-        book.copies >= 0 &&
-        status === "available" &&
-        book.status === "available"
-      ) {
-        book.copies += 1;
-      } else if (book.copies === 0 && status === "available") {
-        book.copies += 1;
-      } else if (book.copies === 0 && status === "reserved") {
-        return res.status(404).json({ error: "Книг більше немає" });
+      switch (status) {
+        case "reserved":
+          if (book.copies > 0) {
+            book.copies -= 1;
+            book.status = "available";
+          }
+          break;
+        case "available":
+          if (book.copies >= 0) {
+            book.copies += 1;
+            book.status = "available";
+          } else if (book.copies === 0) {
+            book.copies += 1;
+            book.status = "available";
+          }
+          break;
+        default:
+          if (book.copies === 0 && status === "reserved") {
+            return res.status(404).json({ error: "Книг більше немає" });
+          }
       }
 
       if (book.copies === 0) book.status = "checked out";
